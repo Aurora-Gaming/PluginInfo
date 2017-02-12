@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
 using NDesk.Options;
 using Terraria;
 using TerrariaApi.Server;
@@ -9,7 +10,7 @@ using TShockAPI;
 
 namespace PluginInfo
 {
-	[ApiVersion(1, 23)]
+	[ApiVersion(2, 0)]
 	public class PluginInfo : TerrariaPlugin
 	{
 		public override string Author => "Enerdy";
