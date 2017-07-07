@@ -53,8 +53,8 @@ namespace PluginInfo
 		{
 			if (e.Parameters.Count == 0)
 			{
-				e.Player.SendInfoMessage($"Syntax: {Commands.Specifier}plugin <find/info/list> [params...]");
-				e.Player.SendInfoMessage("Type {0}plugin <find/info/list> -? OR -h OR --help for command details.",
+				e.Player.SendInfoMessage($"Syntax: {Commands.Specifier}plugin <find/info/list/listdebug> [params...]");
+				e.Player.SendInfoMessage("Type {0}plugin <find/info/list/listdebug> -? OR -h OR --help for command details.",
 					Commands.Specifier);
 				return;
 			}
@@ -87,10 +87,18 @@ namespace PluginInfo
 					await ListCommand(e);
 					return;
 
-				default:
-					e.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}plugin <find/info/list> [params...]",
+			  // List Command
+			  case "-ld":
+			  case "alldebug":
+			  case "listdebug":
+			  case "lsdebug":
+			    await ListCommand(e, true);
+			    return;
+
+        default:
+					e.Player.SendErrorMessage("Invalid syntax! Proper syntax: {0}plugin <find/info/list/listdebug> [params...]",
 						Commands.Specifier);
-					e.Player.SendInfoMessage("Type {0}plugin <find/info/list> -? OR -h OR --help for command details.",
+					e.Player.SendInfoMessage("Type {0}plugin <find/info/list/listdebug> -? OR -h OR --help for command details.",
 						Commands.Specifier);
 					break;
 			}
@@ -198,12 +206,16 @@ namespace PluginInfo
 			});
 		}
 
-		Task ListCommand(CommandArgs e)
+		Task ListCommand(CommandArgs e, bool debugOnly = false)
 		{
+		  Func<TerrariaPlugin, bool> evaluator =
+		    plugin => !debugOnly || GetAssemblyConfiguration(plugin.GetType().Assembly) == "Debug";
+
 			/* All this command does is list all currently installed plugins
 			 * Output format depends on the receiver */
 			 List<TerrariaPlugin> plugins = ServerApi.Plugins
 				.Select(p => p.Plugin)
+        .Where(evaluator)
 				.OrderBy(p => p.Name)
 				.ToList();
 
