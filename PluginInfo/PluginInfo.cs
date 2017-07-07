@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
 using Mono.Options;
@@ -210,7 +212,8 @@ namespace PluginInfo
 
 		void DisplayPluginInfo(TSPlayer receiver, TerrariaPlugin plugin)
 		{
-			string format;
+		  string opt = GetAssemblyConfiguration(plugin.GetType().Assembly);
+      string format;
 			if (receiver.RealPlayer)
 			{
 				format = $"{TShock.Utils.ColorTag("{0}", Color.Violet)}: {{1}}";
@@ -220,7 +223,12 @@ namespace PluginInfo
 				format = "{0}: {1}";
 			}
 
-			receiver.SendInfoMessage(format, "Name", $"{plugin.Name} (v{plugin.Version.ToString()})");
+		  receiver.SendInfoMessage(format, "Name",
+		    string.Format("{0} (v{1}) ({2})", plugin.Name, plugin.Version.ToString(),
+		      opt == "Debug"
+		        ? TShock.Utils.ColorTag("Debug", Color.OrangeRed)
+		        : TShock.Utils.ColorTag("Release", Color.LimeGreen)));
+
 			receiver.SendInfoMessage(format, "Author", plugin.Author);
 			receiver.SendInfoMessage(format, "Description", plugin.Description);
 		}
@@ -234,13 +242,14 @@ namespace PluginInfo
 
 				// Assume console, use a string table
 				TableHelper.PrintLine();
-				TableHelper.PrintRow("Name", "Author", "Version");
+				TableHelper.PrintRow("Name", "Author", "Version", "Configuration");
 				TableHelper.PrintLine();
 				foreach (TerrariaPlugin p in plugins)
 				{
 					TableHelper.PrintRow(p.Name,
 										 p.Author,
-										 p.Version.ToString());
+										 p.Version.ToString(),
+                     GetAssemblyConfiguration(p.GetType().Assembly));
 				}
 				TableHelper.PrintLine();
 			}
@@ -270,5 +279,15 @@ namespace PluginInfo
 				receiver.SendInfoMessage(String.Join(", ", plugins.Select(p => p.Name)));
 			}
 		}
+
+	  string GetAssemblyConfiguration(Assembly asm)
+	  {
+	    var attrib = asm.GetCustomAttributes(typeof(DebuggableAttribute), false).FirstOrDefault() as DebuggableAttribute;
+
+	    if (attrib != null)
+	      return attrib.IsJITOptimizerDisabled ? "Debug" : "Release";
+	    else
+	      return "Release";
+	  }
 	}
 }
