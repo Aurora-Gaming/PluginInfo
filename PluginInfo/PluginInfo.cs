@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using NDesk.Options;
+using Mono.Options;
 using Terraria;
 using TerrariaApi.Server;
 using TShockAPI;
