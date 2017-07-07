@@ -19,7 +19,7 @@ namespace PluginInfo
 
 		public override string Name => "Plugin Information";
 
-		public override Version Version => System.Reflection.Assembly.GetExecutingAssembly().GetName().Version;
+		public override Version Version => typeof(PluginInfo).Assembly.GetName().Version;
 
 		public PluginInfo(Main game) : base(game)
 		{
