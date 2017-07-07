@@ -10,7 +10,7 @@ using TShockAPI;
 
 namespace PluginInfo
 {
-	[ApiVersion(2, 0)]
+	[ApiVersion(2, 1)]
 	public class PluginInfo : TerrariaPlugin
 	{
 		public override string Author => "Enerdy";
